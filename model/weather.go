@@ -16,6 +16,6 @@ type Weather struct {
 	WeatherIcon string  `json:"weather_icon"`
 }
 
-func (p *Weather) FirstById(id uint) (tx *gorm.DB) {
-	return DB.Where("id = ?", id).First(&p)
+func (p *Weather) Limit(slice *[]Weather) (tx *gorm.DB) {
+	return DB.Limit(3).Find(slice)
 }

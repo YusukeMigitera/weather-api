@@ -3,7 +3,6 @@ package controller
 import (
 	"fmt"
 	"net/http"
-	"strconv"
 	"weather-api/model"
 	"weather-api/view_model"
 
@@ -11,21 +10,50 @@ import (
 )
 
 func GetForecast(c echo.Context) error {
-	fmt.Print("id:")
-	i, _ := strconv.Atoi(c.QueryParam("q"))
-	id := uint(i)
-	fmt.Println(id)
-	weather := model.Weather{}
-	weather.FirstById(id)
+	place := c.QueryParam("q")
+	fmt.Printf("%s, ", place)
 
-	city := view_model.CityForecast{}
+	var weathers []model.Weather
+	weather := model.Weather{}
+	weather.Limit(&weathers)
+	fmt.Println(weathers)
+
+	forecastList := []view_model.ForecastListData{}
+	for _, weather := range weathers {
+		forecastList = append(forecastList, view_model.ForecastListData{
+			Dt: weather.Dt,
+			Main: view_model.Main{
+				Temp:      weather.TempAverage,
+				TempMin:   weather.TempMin,
+				TempMax:   weather.TempMax,
+				Pressure:  1013.00,
+				SeaLevel:  1013.00,
+				GrndLevel: 1011.00,
+				Humidity:  weather.Humidity,
+				Temp_kf:   1.0,
+			},
+			Weather: []view_model.Weather{{
+				Id:          800,
+				Main:        weather.Weather,
+				Description: weather.Weather + " sky",
+				Icon:        weather.WeatherIcon,
+			}},
+			Clouds: view_model.Clouds{All: 0},
+			Wind: view_model.Wind{
+				Speed: weather.WindSpeed,
+				Deg:   275.935,
+			},
+			Sys:   view_model.Sys{Pod: "n"},
+			DtTxt: "2019-10-05 03:00:00",
+		})
+	}
 
 	forecast := view_model.Forecast{
 		Cod:     "200",
 		Message: 0.011,
-		Cnt:     40,
-		List:    []string{"0", "1", "2"},
-		City:    city,
+		Cnt:     3,
+		List:    forecastList,
+		City:    view_model.CityForecast{},
 	}
 
 	return c.JSON(http.StatusOK, forecast)
