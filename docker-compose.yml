@@ -1,0 +1,24 @@
+version: "3" # composeファイルのバージョン
+services: 
+    app: # サービス名
+        build: ./app/ # ビルドに使用するDockerfileの場所
+        tty: true # コンテナの永続化
+        ports: # ホストOSのポートとコンテナのポート番号 
+            - "8080:8080"
+        volumes:
+            - ./ # マウントディレクトリ
+        depends_on: 
+            - mysql
+
+    mysql:
+        build: ./mysql/
+        volumes:
+            # 初期データを投入するSQLが格納されているディレクトリ
+            - ./mysql/init:/docker-entrypoint-initdb.d
+            # 永続化するときにマウントするディレクトリ
+            - ./mysql/data:/var/lib/mysql
+        environment: 
+            - MYSQL_ROOT_PASSWORD=password
+        ports:
+            - "3306:3306"
+        container_name: mysql-container
