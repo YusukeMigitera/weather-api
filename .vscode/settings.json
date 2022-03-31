@@ -1,0 +1,6 @@
+{
+    "go.gopath": "/Users/migitera.yusuke/go",
+    "go.toolsEnvVars": {
+        "GO111MODULE": "on"
+    }
+}
